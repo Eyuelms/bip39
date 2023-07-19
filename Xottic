@@ -1,0 +1,25 @@
+from bip39 import mnemonic 
+import requests
+
+# API endpoints for checking balances  
+CHAIN_URLS = {
+    "BTC": "https://blockchain.info/balance?active=%s",
+    "ETH": "https://api.etherscan.io/api?module=account&action=balance&address=%s&tag=latest",  
+    # ... Add more coin URLs
+}
+
+# Check a single wallet address  
+def check_wallet(wallet_addr):
+    for chain, url in CHAIN_URLS.items():
+        url = url % wallet_addr
+        resp = requests.get(url)
+        balance = resp.json()["result"]
+        if balance > 0:
+            print(f"Found {balance} {chain} at {wallet_addr}")
+
+# Generate and check wallets    
+for _ in range(60000000):  # 60 million
+    seed = mnemonic.generate_mnemonic()
+    # Derive private key and wallet address from seed  
+    addr = get_addr_from_seed(seed) 
+    check_wallet(addr)
